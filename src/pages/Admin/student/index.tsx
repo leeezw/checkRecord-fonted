@@ -45,6 +45,7 @@ const StudentAdminPage: React.FC = () => {
       dataIndex: 'id',
       valueType: 'text',
       hideInForm: true,
+      hideInSearch: true,
     },
     {
       title: '身份证号',
@@ -87,6 +88,7 @@ const StudentAdminPage: React.FC = () => {
     {
       title: '年级',
       dataIndex: 'usergrade',
+      hideInSearch: true,
       valueType: 'text',
       formItemProps: {
         rules: [{ required: true, message: '请输入年级' }],
@@ -95,6 +97,7 @@ const StudentAdminPage: React.FC = () => {
     {
       title: '班级',
       dataIndex: 'userclass',
+      hideInSearch: true,
       valueType: 'text',
       formItemProps: {
         rules: [{ required: true, message: '请输入班级' }],
@@ -104,6 +107,7 @@ const StudentAdminPage: React.FC = () => {
       title: '学校名称',
       dataIndex: 'schoolname',
       valueType: 'text',
+      hideInSearch: true,
       formItemProps: {
         rules: [{ required: true, message: '请输入学校名称' }],
       },
@@ -111,6 +115,7 @@ const StudentAdminPage: React.FC = () => {
     {
       title: '学校所在地',
       dataIndex: 'schoolprovince',
+      hideInSearch: true,
       valueType: 'text',
       render: (_, record) => (
         `${record.schoolprovince || ''}${record.schoolcity || ''}${record.schoolarea || ''}${record.schooltown || ''}`
@@ -124,6 +129,7 @@ const StudentAdminPage: React.FC = () => {
       title: '出生日期',
       dataIndex: 'birthday',
       valueType: 'date',
+      hideInSearch: true,
       formItemProps: {
         rules: [{ required: true, message: '请选择出生日期' }],
       },
@@ -131,6 +137,7 @@ const StudentAdminPage: React.FC = () => {
     {
       title: '检查日期',
       dataIndex: 'checkday',
+      hideInSearch: true,
       valueType: 'date',
     },
     {
