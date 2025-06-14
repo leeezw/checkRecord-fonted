@@ -47,7 +47,7 @@ export async function addStudentUsingPost(params: API.StudentAddRequest) {
  * @param params
  */
 export async function updateStudentUsingPost(params: API.StudentUpdateRequest) {
-  return request<API.BaseResponseBoolean>('/api/student/update', {
+  return request<API.BaseResponseBoolean>('/api/student/edit/' + params.id , {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',

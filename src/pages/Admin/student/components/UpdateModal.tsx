@@ -20,7 +20,7 @@ interface Props {
 const handleUpdate = async (fields: API.UserUpdateRequest) => {
   const hide = message.loading('正在更新');
   try {
-    await updateUserUsingPost(fields);
+    await updateStudentUsingPost(fields);
     hide();
     message.success('更新成功');
     return true;
