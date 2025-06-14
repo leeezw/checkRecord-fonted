@@ -10,30 +10,24 @@ import React, { useRef, useState } from 'react';
 
 /**
  * 学生管理页面
- *
- * @constructor
  */
 const StudentAdminPage: React.FC = () => {
-  // 是否显示新建窗口
   const [createModalVisible, setCreateModalVisible] = useState<boolean>(false);
-  // 是否显示更新窗口
   const [updateModalVisible, setUpdateModalVisible] = useState<boolean>(false);
   const actionRef = useRef<ActionType>();
-  // 当前学生点击的数据
   const [currentRow, setCurrentRow] = useState<API.Student>();
 
-  /**
-   * 删除节点
-   *
-   * @param row
-   */
+  // 身份证号正则验证（18位，最后一位可能是X）
+  const idCardRegex = /^[1-9]\d{5}(18|19|20)\d{2}(0[1-9]|1[0-2])(0[1-9]|[12]\d|3[01])\d{3}[\dXx]$/;
+  
+  // 手机号正则验证（11位，1开头）
+  const phoneRegex = /^1[3-9]\d{9}$/;
+
   const handleDelete = async (row: API.Student) => {
     const hide = message.loading('正在删除');
     if (!row) return true;
     try {
-      await deleteStudentUsingPost({
-        id: row.id as any,
-      });
+      await deleteStudentUsingPost({ id: row.id as any });
       hide();
       message.success('删除成功');
       actionRef?.current?.reload();
@@ -45,9 +39,6 @@ const StudentAdminPage: React.FC = () => {
     }
   };
 
-  /**
-   * 表格列配置
-   */
   const columns: ProColumns<API.Student>[] = [
     {
       title: 'ID',
@@ -59,50 +50,83 @@ const StudentAdminPage: React.FC = () => {
       title: '身份证号',
       dataIndex: 'userid',
       valueType: 'text',
+      formItemProps: {
+        rules: [
+          { required: true, message: '请输入身份证号' },
+          { pattern: idCardRegex, message: '请输入有效的身份证号' }
+        ],
+      },
     },
     {
       title: '学籍卡号',
       dataIndex: 'stuid',
       valueType: 'text',
+      formItemProps: {
+        rules: [{ required: true, message: '请输入学籍卡号' }],
+      },
     },
     {
       title: '姓名',
       dataIndex: 'username',
       valueType: 'text',
+      formItemProps: {
+        rules: [{ required: true, message: '请输入姓名' }],
+      },
     },
     {
       title: '手机号',
       dataIndex: 'userphone',
       valueType: 'text',
+      formItemProps: {
+        rules: [
+          { required: true, message: '请输入手机号' },
+          { pattern: phoneRegex, message: '请输入有效的手机号' }
+        ],
+      },
     },
     {
       title: '年级',
       dataIndex: 'usergrade',
       valueType: 'text',
+      formItemProps: {
+        rules: [{ required: true, message: '请输入年级' }],
+      },
     },
     {
       title: '班级',
       dataIndex: 'userclass',
       valueType: 'text',
+      formItemProps: {
+        rules: [{ required: true, message: '请输入班级' }],
+      },
     },
     {
       title: '学校名称',
       dataIndex: 'schoolname',
       valueType: 'text',
+      formItemProps: {
+        rules: [{ required: true, message: '请输入学校名称' }],
+      },
     },
     {
       title: '学校所在地',
       dataIndex: 'schoolprovince',
       valueType: 'text',
       render: (_, record) => (
-        `${record.schoolProvince || ''}${record.schoolCity || ''}${record.schoolArea || ''}${record.schoolTown || ''}`
+        `${record.schoolprovince || ''}${record.schoolcity || ''}${record.schoolarea || ''}${record.schooltown || ''}`
       ),
       search: false,
+      formItemProps: {
+        rules: [{ required: true, message: '请输入学校所在地' }],
+      },
     },
     {
       title: '出生日期',
       dataIndex: 'birthday',
       valueType: 'date',
+      formItemProps: {
+        rules: [{ required: true, message: '请选择出生日期' }],
+      },
     },
     {
       title: '检查日期',
@@ -131,12 +155,10 @@ const StudentAdminPage: React.FC = () => {
       valueType: 'option',
       render: (_, record) => (
         <Space size="middle">
-          <Typography.Link
-            onClick={() => {
-              setCurrentRow(record);
-              setUpdateModalVisible(true);
-            }}
-          >
+          <Typography.Link onClick={() => {
+            setCurrentRow(record);
+            setUpdateModalVisible(true);
+          }}>
             修改
           </Typography.Link>
           <Typography.Link type="danger" onClick={() => handleDelete(record)}>
@@ -153,31 +175,21 @@ const StudentAdminPage: React.FC = () => {
         headerTitle={'学生管理'}
         actionRef={actionRef}
         rowKey="id"
-        search={{
-          labelWidth: 120,
-        }}
+        search={{ labelWidth: 120 }}
         toolBarRender={() => [
-          <Button
-            type="primary"
-            key="primary"
-            onClick={() => {
-              setCreateModalVisible(true);
-            }}
-          >
+          <Button type="primary" key="primary" onClick={() => setCreateModalVisible(true)}>
             <PlusOutlined /> 新建学生
           </Button>,
         ]}
         request={async (params, sort, filter) => {
           const sortField = Object.keys(sort)?.[0];
           const sortOrder = sort?.[sortField] ?? undefined;
-
           const { data, code } = await listStudentByPageUsingPost({
             ...params,
             sortField,
             sortOrder,
             ...filter,
           } as API.StudentQueryRequest);
-
           return {
             success: code === 0,
             data: data?.records || [],
@@ -193,9 +205,7 @@ const StudentAdminPage: React.FC = () => {
           setCreateModalVisible(false);
           actionRef.current?.reload();
         }}
-        onCancel={() => {
-          setCreateModalVisible(false);
-        }}
+        onCancel={() => setCreateModalVisible(false)}
       />
       <UpdateModal
         visible={updateModalVisible}
@@ -206,9 +216,7 @@ const StudentAdminPage: React.FC = () => {
           setCurrentRow(undefined);
           actionRef.current?.reload();
         }}
-        onCancel={() => {
-          setUpdateModalVisible(false);
-        }}
+        onCancel={() => setUpdateModalVisible(false)}
       />
     </PageContainer>
   );
