@@ -16,6 +16,7 @@ export default [
     routes: [
       { path: '/admin', redirect: '/admin/user' },
       { icon: 'table', path: '/admin/user', component: './Admin/User', name: '用户管理' },
+      { icon: 'table', path: '/admin/student', component: './Admin/student', name: '学生管理' },
     ],
   },
   { path: '/', redirect: '/welcome' },

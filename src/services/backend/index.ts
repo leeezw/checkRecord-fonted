@@ -7,6 +7,7 @@ import * as postController from './postController';
 import * as postFavourController from './postFavourController';
 import * as postThumbController from './postThumbController';
 import * as userController from './userController';
+import * as studentController from './studentController';
 import * as wxMpController from './wxMpController';
 export default {
   wxMpController,

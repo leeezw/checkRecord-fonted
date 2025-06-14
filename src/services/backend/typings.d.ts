@@ -326,4 +326,86 @@ declare namespace API {
     userProfile?: string;
     userRole?: string;
   };
+
+  declare namespace API {
+    // 学生相关类型
+    type Student = {
+      id?: number;
+      userId?: string;
+      stuId?: string;
+      userPhone?: string;
+      userGrade?: string;
+      userName?: string;
+      userClass?: string;
+      schoolName?: string;
+      schoolProvince?: string;
+      schoolCity?: string;
+      schoolArea?: string;
+      schoolTown?: string;
+      schoolAddress?: string;
+      birthDay?: string;
+      checkDay?: string;
+      userProfile?: string;
+      createTime?: string;
+      updateTime?: string;
+      isDelete?: number;
+    };
+  
+    type StudentQueryRequest = {
+      current?: number;
+      pageSize?: number;
+      sortField?: string;
+      sortOrder?: string;
+      userId?: string;
+      stuId?: string;
+      userName?: string;
+      userGrade?: string;
+      userClass?: string;
+      schoolName?: string;
+    };
+  
+    type StudentAddRequest = {
+      userId: string;
+      stuId: string;
+      userPhone?: string;
+      userGrade?: string;
+      userName?: string;
+      userClass?: string;
+      schoolName?: string;
+      schoolProvince?: string;
+      schoolCity?: string;
+      schoolArea?: string;
+      schoolTown?: string;
+      schoolAddress?: string;
+      birthDay?: string;
+      checkDay?: string;
+      userProfile?: string;
+    };
+  
+    type StudentUpdateRequest = {
+      id: number;
+      userId?: string;
+      stuId?: string;
+      userPhone?: string;
+      userGrade?: string;
+      userName?: string;
+      userClass?: string;
+      schoolName?: string;
+      schoolProvince?: string;
+      schoolCity?: string;
+      schoolArea?: string;
+      schoolTown?: string;
+      schoolAddress?: string;
+      birthDay?: string;
+      checkDay?: string;
+      userProfile?: string;
+    };
+  
+    type PageStudent = {
+      records?: Student[];
+      total?: number;
+      current?: number;
+      size?: number;
+    };
+  }
 }
