@@ -114,7 +114,7 @@ const SpineExaminationForm = () => {
       <Title level={2}>脊柱弯曲异常记录筛查表</Title>
       <Divider />   
       
-         <Title level={3}>脊柱侧弯筛查</Title>
+         <Title level={3}>一脊柱侧弯筛查</Title>
       <Divider />
       <Form.Item
         name="spineScoliosisGeneralCheck"
@@ -130,14 +130,20 @@ const SpineExaminationForm = () => {
           <Radio value="⑥棘突连线倾斜或偏离正中线">⑥棘突连线倾斜或偏离正中线</Radio>
         </Radio.Group>
       </Form.Item>
+
       <Form.Item
+        name="spineScoliosisGeneralCheck"
+        label="（2）前屈试验"
+        rules={[{ required: true}]}
+      >
+         <Form.Item
         name="spineScoliosisThoracicSection"
         label="胸段"
         rules={[{ required: true, message: '请选择胸段情况' }]}
       >
         <Radio.Group>
           <Radio value="①无侧弯">①无侧弯</Radio>
-          <Radio value="②左底右高">②左底右高</Radio>
+          <Radio value="②左底右高">②左低右高</Radio>
           <Radio value="③左高右低">③左高右低</Radio>
         </Radio.Group>
       </Form.Item>
@@ -181,6 +187,9 @@ const SpineExaminationForm = () => {
       >
         <Input placeholder="请输入角度值" />
       </Form.Item>
+      </Form.Item>
+  
+     
       <Form.Item
         name="spineMotionExperiment"
         label="（3）是否进行脊柱运动实验"
