@@ -65,9 +65,9 @@ const Login: React.FC = () => {
             minWidth: 280,
             maxWidth: '75vw',
           }}
-          logo={<img alt="logo" style={{ height: '100%' }} src="/logo.svg" />}
-          title="鱼皮前端万用模板"
-          subTitle={'快速开发属于自己的前端项目'}
+          // logo={<img alt="logo" style={{ height: '100%' }} src="/logo.svg" />}
+          title="体检录入系统"
+          subTitle={''}
           initialValues={{
             autoLogin: true,
           }}
@@ -125,7 +125,7 @@ const Login: React.FC = () => {
               textAlign: 'right',
             }}
           >
-            <Link to="/user/register">新用户注册</Link>
+            {/* <Link to="/user/register">新用户注册</Link> */}
           </div>
         </LoginForm>
       </div>
