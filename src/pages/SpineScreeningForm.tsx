@@ -1,6 +1,8 @@
 import React, { useState } from'react';
-import { Form, Input, Select, Radio, Button, message } from 'antd';
+import { Form, Input, Select, Radio, Button, message, Typography, Divider } from 'antd';
 const { Option } = Select;
+const { Title } = Typography;
+
 const { TextArea } = Input;
 
 const SpineExaminationForm = () => {
@@ -32,6 +34,8 @@ const SpineExaminationForm = () => {
       autoComplete="off"
     >
       {/* 个人基本情况 */}
+      <Title level={3}>个人基本情况</Title>
+      <Divider />
       <Form.Item
         name="name"
         label="姓名"
@@ -107,6 +111,11 @@ const SpineExaminationForm = () => {
       </Form.Item>
 
       {/* 脊柱弯曲异常记录筛查表 - 脊柱侧弯筛查 */}
+      <Title level={2}>脊柱弯曲异常记录筛查表</Title>
+      <Divider />   
+      
+         <Title level={3}>脊柱侧弯筛查</Title>
+      <Divider />
       <Form.Item
         name="spineScoliosisGeneralCheck"
         label="（1）一般检查"
@@ -183,39 +192,33 @@ const SpineExaminationForm = () => {
         </Radio.Group>
       </Form.Item>
       <Form.Item
-  name="spineMotionATRThoracic"
-  label="胸段ATR"
-  dependencies={['spineMotionExperiment']}
-  // 移除函数式 rules，改为直接的规则数组
-  rules={[{ required: false }]} // 先设置为非必填，后面在提交时验证
->
+        name="spineMotionATRThoracic"
+        label="胸段ATR"
+        dependencies={['spineMotionExperiment']}
+        rules={[{ required: false }]} 
+      >
         <Input placeholder="请输入胸段ATR值" />
       </Form.Item>
-
-
-
       <Form.Item
-  name="spineMotionATRLumbarThoracic"
-  label="腰胸段ATR"
-  dependencies={['spineMotionExperiment']}
-  // 移除函数式 rules，改为直接的规则数组
-  rules={[{ required: false }]} // 先设置为非必填，后面在提交时验证
->
+        name="spineMotionATRLumbarThoracic"
+        label="腰胸段ATR"
+        dependencies={['spineMotionExperiment']}
+        rules={[{ required: false }]} 
+      >
         <Input placeholder="请输入腰胸段ATR值" />
       </Form.Item>
-
-
       <Form.Item
-  name="spineMotionATRLumbar"
-  label="腰段ATR"
-  dependencies={['spineMotionExperiment']}
-  // 移除函数式 rules，改为直接的规则数组
-  rules={[{ required: false }]} // 先设置为非必填，后面在提交时验证
->
+        name="spineMotionATRLumbar"
+        label="腰段ATR"
+        dependencies={['spineMotionExperiment']}
+        rules={[{ required: false }]} 
+      >
         <Input placeholder="请输入腰段ATR值" />
       </Form.Item>
 
       {/* 脊柱前后弯曲异常筛查 */}
+      <Title level={3}>脊柱前后弯曲异常筛查</Title>
+      <Divider />
       <Form.Item
         name="spineAnteriorPosteriorCheck"
         label="（4）一般检查"
@@ -240,6 +243,8 @@ const SpineExaminationForm = () => {
       </Form.Item>
 
       {/* 疾病史 */}
+      <Title level={3}>疾病史</Title>
+      <Divider />
       <Form.Item
         name="medicalHistory"
         label="（6）病史"
@@ -254,6 +259,8 @@ const SpineExaminationForm = () => {
       </Form.Item>
 
       {/* 常见不良体态筛查 */}
+      <Title level={3}>常见不良体态筛查</Title>
+      <Divider />
       <Form.Item
         name="badPostureScreening"
         label="常见不良体态筛查"
@@ -290,7 +297,7 @@ const SpineExaminationForm = () => {
         name="suggestion"
         label="建议"
       >
-        <TextArea placeholder="请输入建议" />
+        <TextArea  placeholder="请输入建议" />
       </Form.Item>
       <Form.Item
         name="signer"
