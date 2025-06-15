@@ -71,11 +71,19 @@ const SpineExaminationForm = () => {
       </Form.Item>
       
       <Form.Item
-        name="idCardOrSchoolCard"
-        label="身份证号/学籍卡号"
-        rules={[{ required: true, message: '请输入身份证号/学籍卡号' }]}
+        name="idCard"
+        label="身份证号"
+        rules={[{ required: true, message: '请输入身份证号' }]}
       >
-        <Input placeholder="请输入身份证号/学籍卡号" />
+        <Input.Search placeholder="请输入身份证号" />
+      </Form.Item>
+
+      <Form.Item
+        name="SchoolCard"
+        label="学籍卡号"
+        rules={[{ required: true, message: '请输入学籍卡号' }]}
+      >
+        <Input placeholder="请输入学籍卡号" />
       </Form.Item>
       
       <div style={{ display: 'flex' }}>
@@ -257,9 +265,10 @@ const SpineExaminationForm = () => {
         rules={[{ required: true, message: '请选择是否进行脊柱运动实验' }]}
       >
         <Radio.Group>
-          <Radio value="是">是</Radio>
-          <Radio value="否">否</Radio>
+          <Radio value="①是">①是</Radio>
+          <Radio value="②否">②否</Radio>
         </Radio.Group>
+        <div style={{color: 'red'}}> (1选项后进行躯干旋转测量仪检查)</div>
       </Form.Item>
       
       <div style={{ marginLeft: 24, marginBottom: 16 }}>
@@ -311,12 +320,13 @@ const SpineExaminationForm = () => {
             <Checkbox value="③后凸体征">③后凸体征</Checkbox>
           </div>
         </Checkbox.Group>
+        <div style={{color: 'red'}}> (2和3选项后进行俯卧试验)</div>
       </Form.Item>
       
       <Form.Item
         name="spineAnteriorPosteriorProneTest"
         label="（5）俯卧试验"
-        rules={[{ required: true, message: '请选择俯卧试验结果' }]}
+        rules={[{ required: false, message: '请选择俯卧试验结果' }]}
       >
         <Checkbox.Group>
           <div style={{ marginBottom: 8 }}>

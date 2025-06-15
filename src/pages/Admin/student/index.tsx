@@ -1,12 +1,15 @@
 import CreateModal from '@/pages/Admin/student/components/CreateModal';
 import UpdateModal from '@/pages/Admin/student/components/UpdateModal';
-import { deleteStudentUsingPost, listStudentByPageUsingPost } from '@/services/backend/studentController';
-import { PlusOutlined } from '@ant-design/icons';
+import { deleteStudentUsingPost, importExcelUsingPost, listStudentByPageUsingPost } from '@/services/backend/studentController';
+import { PlusOutlined, UploadOutlined, InboxOutlined } from '@ant-design/icons';
 import type { ActionType, ProColumns } from '@ant-design/pro-components';
 import { PageContainer, ProTable } from '@ant-design/pro-components';
 import '@umijs/max';
-import { Button, message, Space, Typography } from 'antd';
+import { Button, message, Modal, Space, Typography, Upload } from 'antd';
+import type { UploadFile } from 'antd/es/upload/interface';
 import React, { useRef, useState } from 'react';
+
+const { Dragger } = Upload;
 
 /**
  * 学生管理页面
@@ -14,13 +17,16 @@ import React, { useRef, useState } from 'react';
 const StudentAdminPage: React.FC = () => {
   const [createModalVisible, setCreateModalVisible] = useState<boolean>(false);
   const [updateModalVisible, setUpdateModalVisible] = useState<boolean>(false);
+  const [importModalVisible, setImportModalVisible] = useState<boolean>(false);
+  const [fileList, setFileList] = useState<UploadFile[]>([]);
+  const [uploading, setUploading] = useState<boolean>(false);
   const actionRef = useRef<ActionType>();
   const [currentRow, setCurrentRow] = useState<API.Student>();
 
-  // 身份证号正则验证（18位，最后一位可能是X）
+  // 身份证号正则验证
   const idCardRegex = /^[1-9]\d{5}(18|19|20)\d{2}(0[1-9]|1[0-2])(0[1-9]|[12]\d|3[01])\d{3}[\dXx]$/;
   
-  // 手机号正则验证（11位，1开头）
+  // 手机号正则验证
   const phoneRegex = /^1[3-9]\d{9}$/;
 
   const handleDelete = async (row: API.Student) => {
@@ -36,6 +42,33 @@ const StudentAdminPage: React.FC = () => {
       hide();
       message.error('删除失败，' + error.message);
       return false;
+    }
+  };
+
+  const handleImport = (visible: boolean) => {
+    setImportModalVisible(visible);
+    if (!visible) {
+      setFileList([]);
+    }
+  };
+
+  const handleUpload = async () => {
+    if (fileList.length === 0) {
+      message.warning('请先选择文件');
+      return;
+    }
+
+    setUploading(true);
+    try {
+      await importExcelUsingPost(fileList[0] as unknown as File);
+      message.success('导入成功');
+      setImportModalVisible(false);
+      setFileList([]);
+      actionRef.current?.reload();
+    } catch (error: any) {
+      message.error(`导入失败: ${error.message}`);
+    } finally {
+      setUploading(false);
     }
   };
 
@@ -184,8 +217,19 @@ const StudentAdminPage: React.FC = () => {
         rowKey="id"
         search={{ labelWidth: 120 }}
         toolBarRender={() => [
-          <Button type="primary" key="primary" onClick={() => setCreateModalVisible(true)}>
+          <Button 
+            type="primary" 
+            key="primary" 
+            onClick={() => setCreateModalVisible(true)}
+          >
             <PlusOutlined /> 新建学生
+          </Button>,
+          <Button 
+            type="primary" 
+            key="import" 
+            onClick={() => handleImport(true)}
+          >
+            <UploadOutlined /> 批量导入
           </Button>,
         ]}
         request={async (params, sort, filter) => {
@@ -205,6 +249,8 @@ const StudentAdminPage: React.FC = () => {
         }}
         columns={columns}
       />
+      
+      {/* 新建模态框 */}
       <CreateModal
         visible={createModalVisible}
         columns={columns}
@@ -214,6 +260,8 @@ const StudentAdminPage: React.FC = () => {
         }}
         onCancel={() => setCreateModalVisible(false)}
       />
+      
+      {/* 编辑模态框 */}
       <UpdateModal
         visible={updateModalVisible}
         columns={columns}
@@ -225,6 +273,39 @@ const StudentAdminPage: React.FC = () => {
         }}
         onCancel={() => setUpdateModalVisible(false)}
       />
+      
+      {/* 导入模态框 - 这是新增的关键部分 */}
+      <Modal
+        title="批量导入学生"
+        open={importModalVisible}
+        onCancel={() => handleImport(false)}
+        onOk={handleUpload}
+        confirmLoading={uploading}
+        okText="开始导入"
+        cancelText="取消"
+      >
+        <Dragger
+          name="file"
+          multiple={false}
+          fileList={fileList}
+          beforeUpload={(file) => {
+            setFileList([file]);
+            return false;
+          }}
+          onRemove={() => {
+            setFileList([]);
+          }}
+          accept=".xlsx,.xls"
+        >
+          <p className="ant-upload-drag-icon">
+            <InboxOutlined />
+          </p>
+          <p className="ant-upload-text">点击或拖拽文件到此处上传</p>
+          <p className="ant-upload-hint">
+            支持Excel文件(.xlsx, .xls)，请确保文件格式正确
+          </p>
+        </Dragger>
+      </Modal>
     </PageContainer>
   );
 };

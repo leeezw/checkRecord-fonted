@@ -55,3 +55,23 @@ export async function updateStudentUsingPost(params: API.StudentUpdateRequest) {
     data: params,
   });
 }
+
+/**
+ * 导入excel
+ */
+/**
+ * 批量导入学生
+ * @param file 上传的Excel文件
+ */
+export async function importExcelUsingPost(file: File) {
+    const formData = new FormData();
+    formData.append('file', file);
+    
+    return request<API.BaseResponse<object>>('/api/student/import', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+      data: formData,
+    });
+  }
