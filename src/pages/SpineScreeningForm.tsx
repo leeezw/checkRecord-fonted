@@ -99,18 +99,19 @@ const SpineExaminationForm = () => {
 
       // 准备学生数据
       const studentData = {
-        name: values.name,
+        username: values.name,
         gender: values.gender,
-        parentPhone: values.parentPhone,
-        idCard: values.idCard,
-        schoolCard: values.SchoolCard,
-        grade: values.grade,
-        class: values.class,
-        schoolLocation: values.schoolLocation,
-        schoolName: values.schoolName,
-        birthDate: values.birthDate?.format('YYYY-MM-DD'),
-        userProfile: JSON.stringify(screeningData),
-        examinerSignature: values.examinerSignature
+        parentphone: values.parentPhone,
+        userid: values.idCard,
+        stuid: values.SchoolCard,
+        usergrade: values.grade,
+        userclass: values.class,
+        schoolprovince: values.schoolLocation,
+        schoolnname: values.schoolName,
+        birthdate: values.birthDate?.format('YYYY-MM-DD'),
+        checkDate: values.checkDate?.format('YYYY-MM-DD'),
+        userpprofile: JSON.stringify(screeningData),
+        schoolarea: values.examinerSignature
       };
 
       // 调用API
@@ -258,6 +259,15 @@ const handleGeneralCheckChange = (checkedValues) => {
           rules={[{ required: true, message: '请选择出生日期' }]}
         >
           <DatePicker placeholder="选择出生日期" style={{ width: '100%' }} />
+        </Form.Item>
+
+        <Form.Item
+          name="checkDate"
+          label="检查时间"
+          style={{ flex: 1, marginRight: 8 }}
+          rules={[{ required: true, message: '请选择检查时间' }]}
+        >
+          <DatePicker placeholder="选择检查时间" style={{ width: '100%' }} />
         </Form.Item>
       </div>
 
