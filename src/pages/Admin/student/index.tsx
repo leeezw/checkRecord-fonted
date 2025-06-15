@@ -108,6 +108,21 @@ const StudentAdminPage: React.FC = () => {
       },
     },
     {
+        title: '性别',
+        dataIndex: 'gender',
+        valueType: 'radio',
+        fieldProps: {
+          options: [
+            { label: '男', value: '男' },
+            { label: '女', value: '女' }
+          ]
+        },
+        formItemProps: {
+          rules: [{ required: true, message: '请选择性别' }],
+        },
+        hideInSearch: true,
+      },
+    {
       title: '手机号',
       dataIndex: 'userphone',
       valueType: 'text',

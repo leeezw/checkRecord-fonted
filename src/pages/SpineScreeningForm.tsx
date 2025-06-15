@@ -3,7 +3,6 @@ import { Form, Input, Select, Radio, Button, message, Typography, Divider, DateP
 const { Option } = Select;
 const { Title } = Typography;
 const { TextArea } = Input;
-import type { InputNumberProps } from 'antd';
 import { InputNumber } from 'antd';
 import { addStudentUsingPost } from '@/services/backend/studentController';
 
@@ -100,7 +99,7 @@ const SpineExaminationForm = () => {
       // 准备学生数据
       const studentData = {
         username: values.name,
-        gender: values.gender,
+        schoolarea: values.gender,
         parentphone: values.parentPhone,
         userid: values.idCard,
         stuid: values.SchoolCard,
@@ -111,7 +110,7 @@ const SpineExaminationForm = () => {
         birthdate: values.birthDate?.format('YYYY-MM-DD'),
         checkDate: values.checkDate?.format('YYYY-MM-DD'),
         userpprofile: JSON.stringify(screeningData),
-        schoolarea: values.examinerSignature
+        schoolcity: values.examinerSignature
       };
 
       // 调用API
