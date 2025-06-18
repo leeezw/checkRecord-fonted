@@ -144,9 +144,9 @@ const SpineExaminationForm = () => {
         schoolLocation: student.schoolprovince,
         schoolName: student.schoolname,
         // 修复3: 正确设置出生日期字段
-        birthDate: student.birthday ? moment(student.birthday) : null,
+        birthDate: student.birthday ? moment(student.birthday, 'YYYY-MM-DD') : null,
         // 修复4: 正确设置检查日期字段
-        checkDate: student.checkday ? moment(student.checkday) : null,
+        checkDate: student.checkday ? moment(student.checkday, 'YYYY-MM-DD') : null,
         examinerSignature: student.schoolcity,
         
         // 筛查数据
@@ -255,8 +255,9 @@ const SpineExaminationForm = () => {
         userclass: values.class,
         schoolprovince: values.schoolLocation,
         schoolname: values.schoolName,
-        birthdate: values.birthDate?.format('YYYY-MM-DD'),
-        checkdate: values.checkDate?.format('YYYY-MM-DD'),
+        // 修复日期字段名称
+        birthday: values.birthDate?.format('YYYY-MM-DD'),
+        checkday: values.checkDate?.format('YYYY-MM-DD'),
         userprofile: JSON.stringify(screeningData),
         schoolcity: values.examinerSignature
       };
@@ -604,6 +605,14 @@ const SpineExaminationForm = () => {
         <Form.Item
           name="spineMotionExperiment"
           label="（3）是否进行脊柱运动实验"
+                    // rules={[
+          //   { 
+          //     required: false, 
+          //     message: '请选择是否进行脊柱运动实验',
+          //     validator: (_, value) => 
+          //       value ? Promise.resolve() : Promise.reject(new Error('请选择是否进行脊柱运动实验'))
+          //   }
+          // ]}
         >
           <Radio.Group>
             <Radio value="①是">①是</Radio>
