@@ -70,6 +70,10 @@ const SpineExaminationForm = () => {
   const [loading, setLoading] = useState(false);
   const [existingStudent, setExistingStudent] = useState<API.Student | null>(null);
   
+  // 为问题字段创建独立状态
+  const [spineMotionExperimentValue, setSpineMotionExperimentValue] = useState<string>('');
+  const [spineAnteriorPosteriorCheckValue, setSpineAnteriorPosteriorCheckValue] = useState<string[]>([]);
+  
   // 加载学校和地址选项
   useEffect(() => {
     const loadOptions = async () => {
@@ -114,6 +118,10 @@ const SpineExaminationForm = () => {
       } else {
         setExistingStudent(null);
         form.resetFields();
+        // 重置独立状态
+        setSpineMotionExperimentValue('');
+        setSpineAnteriorPosteriorCheckValue([]);
+        setScoliosisChecked(false);
         message.info('未找到该学生信息，请填写完整表单');
       }
     } catch (error) {
@@ -128,14 +136,15 @@ const SpineExaminationForm = () => {
     if (!student) return;
     
     try {
-      // 修复字段名：userpprofile -> userprofile
       const profile = student.userprofile ? JSON.parse(student.userprofile) : {};
+      
+      // 设置独立状态
+      setSpineMotionExperimentValue(profile?.spine_motion_test?.performed || '');
+      setSpineAnteriorPosteriorCheckValue(profile?.anterior_posterior_check?.general_result || []);
       
       form.setFieldsValue({
         name: student.username,
-        // 修复1: 正确设置性别字段
         schoolarea: student.schoolarea,
-        // 修复2: 正确设置电话字段（修复拼写错误）
         userphone: student.userphone,
         idCard: student.userid,
         SchoolCard: student.stuid,
@@ -143,9 +152,7 @@ const SpineExaminationForm = () => {
         class: student.userclass,
         schoolLocation: student.schoolprovince,
         schoolName: student.schoolname,
-        // 修复3: 正确设置出生日期字段
         birthDate: student.birthday ? moment(student.birthday, 'YYYY-MM-DD') : null,
-        // 修复4: 正确设置检查日期字段
         checkDate: student.checkday ? moment(student.checkday, 'YYYY-MM-DD') : null,
         examinerSignature: student.schoolcity,
         
@@ -157,11 +164,12 @@ const SpineExaminationForm = () => {
         lumbarThoracicATR: profile?.forward_bending_test?.thoracolumbar_section?.atr_value || '',
         spineScoliosisLumbarSection: profile?.forward_bending_test?.lumbar_section?.result ? [profile.forward_bending_test.lumbar_section.result] : [],
         lumbarATR: profile?.forward_bending_test?.lumbar_section?.atr_value || '',
-        spineMotionExperiment: profile?.spine_motion_test?.performed || '',
+        // 不再直接设置这些字段，使用独立状态
+        // spineMotionExperiment: profile?.spine_motion_test?.performed || '',
         spineMotionATRThoracic: profile?.spine_motion_test?.thoracic_atr || '',
         spineMotionATRLumbarThoracic: profile?.spine_motion_test?.thoracolumbar_atr || '',
         spineMotionATRLumbar: profile?.spine_motion_test?.lumbar_atr || '',
-        spineAnteriorPosteriorCheck: profile?.anterior_posterior_check?.general_result || [],
+        // spineAnteriorPosteriorCheck: profile?.anterior_posterior_check?.general_result || [],
         spineAnteriorPosteriorProneTest: profile?.anterior_posterior_check?.prone_test_result || [],
         medicalHistory: profile?.medical_history || [],
         badPostureScreening: profile?.bad_posture || [],
@@ -223,13 +231,13 @@ const SpineExaminationForm = () => {
           }
         },
         spine_motion_test: {
-          performed: values.spineMotionExperiment || '',
+          performed: spineMotionExperimentValue || '', // 使用独立状态值
           thoracic_atr: values.spineMotionATRThoracic,
           thoracolumbar_atr: values.spineMotionATRLumbarThoracic,
           lumbar_atr: values.spineMotionATRLumbar
         },
         anterior_posterior_check: {
-          general_result: values.spineAnteriorPosteriorCheck || [],
+          general_result: spineAnteriorPosteriorCheckValue || [], // 使用独立状态值
           prone_test_result: values.spineAnteriorPosteriorProneTest
         },
         medical_history: values.medicalHistory || [],
@@ -255,7 +263,6 @@ const SpineExaminationForm = () => {
         userclass: values.class,
         schoolprovince: values.schoolLocation,
         schoolname: values.schoolName,
-        // 修复日期字段名称
         birthday: values.birthDate?.format('YYYY-MM-DD'),
         checkday: values.checkDate?.format('YYYY-MM-DD'),
         userprofile: JSON.stringify(screeningData),
@@ -277,6 +284,9 @@ const SpineExaminationForm = () => {
         message.success(`${existingStudent ? '更新' : '保存'}成功`);
         form.resetFields();
         setExistingStudent(null);
+        // 重置独立状态
+        setSpineMotionExperimentValue('');
+        setSpineAnteriorPosteriorCheckValue([]);
         setScoliosisChecked(false);
       } else {
         message.error(response.message || `${existingStudent ? '更新' : '保存'}失败`);
@@ -294,11 +304,17 @@ const SpineExaminationForm = () => {
     setScoliosisChecked(checkedValues.includes('③脊柱侧弯（__级）'));
   };
 
-  // 监听一般检查变化
-  const handleGeneralCheckChange = (checkedValues: string[]) => {
-    form.setFieldsValue({
-      spineAnteriorPosteriorCheck: checkedValues
-    });
+  // 处理脊柱运动实验变化
+  const handleSpineMotionExperimentChange = (e: any) => {
+    const value = e.target.value;
+    setSpineMotionExperimentValue(value);
+    form.setFieldsValue({ spineMotionExperiment: value });
+  };
+
+  // 处理脊柱前后弯曲检查变化
+  const handleSpineAnteriorPosteriorCheckChange = (checkedValues: string[]) => {
+    setSpineAnteriorPosteriorCheckValue(checkedValues);
+    form.setFieldsValue({ spineAnteriorPosteriorCheck: checkedValues });
   };
 
   const onFinishFailed = (errorInfo: any) => {
@@ -313,11 +329,6 @@ const SpineExaminationForm = () => {
         name="spine_examination_form"
         labelCol={{ span: 6 }}
         wrapperCol={{ span: 18 }}
-        initialValues={{
-          spineAnteriorPosteriorCheck: [],
-          spineAnteriorPosteriorProneTest: [],
-          spineMotionExperiment: undefined
-        }}
         onFinish={onFinish}
         onFinishFailed={onFinishFailed}
         autoComplete="off"
@@ -351,7 +362,6 @@ const SpineExaminationForm = () => {
           </Radio.Group>
         </Form.Item>
         
-        {/* 修复5: 修正电话字段名 userhone -> userphone */}
         <Form.Item
           name="userphone"
           label="联系电话（父母）"
@@ -603,18 +613,12 @@ const SpineExaminationForm = () => {
         </div>
         
         <Form.Item
-          name="spineMotionExperiment"
           label="（3）是否进行脊柱运动实验"
-                    // rules={[
-          //   { 
-          //     required: false, 
-          //     message: '请选择是否进行脊柱运动实验',
-          //     validator: (_, value) => 
-          //       value ? Promise.resolve() : Promise.reject(new Error('请选择是否进行脊柱运动实验'))
-          //   }
-          // ]}
         >
-          <Radio.Group>
+          <Radio.Group
+            value={spineMotionExperimentValue}
+            onChange={handleSpineMotionExperimentChange}
+          >
             <Radio value="①是">①是</Radio>
             <Radio value="②否">②否</Radio>
           </Radio.Group>
@@ -627,11 +631,15 @@ const SpineExaminationForm = () => {
             label="胸段ATR"
             dependencies={['spineMotionExperiment']}
             rules={[
-              ({ getFieldValue }) => ({
-                required: getFieldValue('spineMotionExperiment') === '①是',
-                message: '请输入胸段ATR值'
+              () => ({
+                validator(_, value) {
+                  if (spineMotionExperimentValue === '①是' && !value) {
+                    return Promise.reject(new Error('请输入胸段ATR值'));
+                  }
+                  return Promise.resolve();
+                }
               })
-            ]} 
+            ]}
           >
             <Input placeholder="请输入胸段ATR值" />
           </Form.Item>
@@ -641,11 +649,15 @@ const SpineExaminationForm = () => {
             label="腰胸段ATR"
             dependencies={['spineMotionExperiment']}
             rules={[
-              ({ getFieldValue }) => ({
-                required: getFieldValue('spineMotionExperiment') === '①是',
-                message: '请输入腰胸段ATR值'
+              () => ({
+                validator(_, value) {
+                  if (spineMotionExperimentValue === '①是' && !value) {
+                    return Promise.reject(new Error('请输入腰胸段ATR值'));
+                  }
+                  return Promise.resolve();
+                }
               })
-            ]} 
+            ]}
           >
             <Input placeholder="请输入腰胸段ATR值" />
           </Form.Item>
@@ -655,11 +667,15 @@ const SpineExaminationForm = () => {
             label="腰段ATR"
             dependencies={['spineMotionExperiment']}
             rules={[
-              ({ getFieldValue }) => ({
-                required: getFieldValue('spineMotionExperiment') === '①是',
-                message: '请输入腰段ATR值'
+              () => ({
+                validator(_, value) {
+                  if (spineMotionExperimentValue === '①是' && !value) {
+                    return Promise.reject(new Error('请输入腰段ATR值'));
+                  }
+                  return Promise.resolve();
+                }
               })
-            ]} 
+            ]}
           >
             <Input placeholder="请输入腰段ATR值" />
           </Form.Item>
@@ -670,18 +686,14 @@ const SpineExaminationForm = () => {
         <Divider />
         
         <Form.Item
-          name="spineAnteriorPosteriorCheck"
           label="（4）一般检查"
-          rules={[
-            { 
-              required: true, 
-              type: 'array',
-              min: 1,
-              message: '请至少选择一项检查结果'
-            }
-          ]}
+          required
         >
-          <Checkbox.Group onChange={handleGeneralCheckChange}>
+          <Checkbox.Group 
+            value={spineAnteriorPosteriorCheckValue}
+            onChange={handleSpineAnteriorPosteriorCheckChange}
+            style={{ width: '100%' }}
+          >
             <div style={{ marginBottom: 8 }}>
               <Checkbox value="①前后凸体征消失">①前后凸体征消失</Checkbox>
             </div>
@@ -698,13 +710,18 @@ const SpineExaminationForm = () => {
         <Form.Item
           name="spineAnteriorPosteriorProneTest"
           label="（5）俯卧试验"
-          dependencies={['spineAnteriorPosteriorCheck']}
           rules={[
-            ({ getFieldValue }) => ({
-              required: (getFieldValue('spineAnteriorPosteriorCheck') || []).some(
-                (val: string) => val === '②前凸体征' || val === '③后凸体征'
-              ),
-              message: '请选择俯卧试验结果'
+            () => ({
+              validator(_, value) {
+                const hasAbnormality = spineAnteriorPosteriorCheckValue.some(
+                  v => v === '②前凸体征' || v === '③后凸体征'
+                );
+                
+                if (hasAbnormality && (!value || value.length === 0)) {
+                  return Promise.reject(new Error('请选择俯卧试验结果'));
+                }
+                return Promise.resolve();
+              }
             })
           ]}
         >
