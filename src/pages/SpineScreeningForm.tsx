@@ -383,7 +383,7 @@ const SpineExaminationForm = () => {
         >
           <Input.Search 
             placeholder="请输入身份证号" 
-            onBlur={handleIdCardBlur}
+            // onBlur={handleIdCardBlur}
             enterButton="查询"
             onSearch={(value) => fetchStudentByIdCard(value)}
           />
@@ -851,17 +851,28 @@ const SpineExaminationForm = () => {
           <Input placeholder="请输入签名" />
         </Form.Item>
         
-        <Form.Item wrapperCol={{ offset: 6, span: 18 }}>
-          <Button
-            type="primary"
-            htmlType="submit"
-            loading={isSubmitting}
-            size="large"
-            style={{ width: '100%', marginTop: 24 }}
-          >
-            {existingStudent ? '更新学生信息' : '提交表单'}
-          </Button>
-        </Form.Item>
+        <Form.Item 
+  wrapperCol={{ 
+    // 手机端取消偏移，全宽度显示
+    ...(window.innerWidth < 768 ? { offset: 0, span: 24 } : { offset: 6, span: 18 })
+  }}
+>
+  <Button
+    type="primary"
+    htmlType="submit"
+    loading={isSubmitting}
+    size="large"
+    style={{ 
+      width: '100%', 
+      marginTop: 24,
+      // 额外添加边框圆角和内边距优化移动端点击体验
+      borderRadius: 8,
+      padding: '12px 16px'
+    }}
+  >
+    {existingStudent ? '更新学生信息' : '提交表单'}
+  </Button>
+</Form.Item>
       </Form>
     </Spin>
   );
