@@ -107,7 +107,7 @@ const SpineExaminationForm = () => {
     setLoading(true);
     try {
       const response = await listStudentByPageUsingPost({ userid: idCard });
-      if (response.code === 0 && response.data) {
+      if (response.code === 0 && response.data && response.data.records.length > 0) {
         setExistingStudent(response.data.records[0]);
         fillFormData(response.data.records[0]);
         message.success('已加载学生信息');
