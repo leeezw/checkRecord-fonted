@@ -75,3 +75,29 @@ export async function importExcelUsingPost(file: File) {
       data: formData,
     });
   }
+
+  /**
+ * 获取学校列表
+ *  */
+export async function listSchool() {
+    return request('/api/school/school/list', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      data: null,
+    });
+  }
+
+    /**
+ * 获取学校地址列表
+ *  */
+export async function listSchoolAddress() {
+    return request('/api/school/address/list', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      data: null,
+    });
+  }

@@ -1,13 +1,13 @@
 import CreateModal from '@/pages/Admin/student/components/CreateModal';
 import UpdateModal from '@/pages/Admin/student/components/UpdateModal';
-import { deleteStudentUsingPost, importExcelUsingPost, listStudentByPageUsingPost } from '@/services/backend/studentController';
+import { deleteStudentUsingPost, importExcelUsingPost, listSchool, listSchoolAddress, listStudentByPageUsingPost } from '@/services/backend/studentController';
 import { PlusOutlined, UploadOutlined, InboxOutlined } from '@ant-design/icons';
 import type { ActionType, ProColumns } from '@ant-design/pro-components';
 import { PageContainer, ProTable } from '@ant-design/pro-components';
 import '@umijs/max';
 import { Button, message, Modal, Space, Typography, Upload } from 'antd';
 import type { UploadFile } from 'antd/es/upload/interface';
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 
 const { Dragger } = Upload;
 
@@ -23,6 +23,36 @@ const StudentAdminPage: React.FC = () => {
   const actionRef = useRef<ActionType>();
   const [currentRow, setCurrentRow] = useState<API.Student>();
 
+  const [schoolOptions, setSchoolOptions] = useState<{label: string; value: string}[]>([]);
+  const [addressOptions, setAddressOptions] = useState<{label: string; value: string}[]>([]);
+  useEffect(() => {
+    const loadOptions = async () => {
+      try {
+        const [schoolRes, addressRes] = await Promise.all([
+            listSchool(),
+          listSchoolAddress()
+        ]);
+        
+        if (schoolRes.code === 0) {
+          setSchoolOptions(schoolRes.data?.map(item => ({
+            label: item.name || '',
+            value: item.name || ''
+          })) || []);
+        }
+        
+        if (addressRes.code === 0) {
+          setAddressOptions(addressRes.data?.map(item => ({
+            label: item.name || '',
+            value: item.name || ''
+          })) || []);
+        }
+      } catch (error) {
+        message.error('加载学校和地址数据失败');
+      }
+    };
+
+    loadOptions();
+  }, []);
   // 身份证号正则验证
   const idCardRegex = /^[1-9]\d{5}(18|19|20)\d{2}(0[1-9]|1[0-2])(0[1-9]|[12]\d|3[01])\d{3}[\dXx]$/;
   
@@ -109,13 +139,13 @@ const StudentAdminPage: React.FC = () => {
     },
     {
         title: '性别',
-        dataIndex: 'gender',
+        dataIndex: 'schoolarea',
         valueType: 'radio',
         fieldProps: {
           options: [
             { label: '男', value: '男' },
             { label: '女', value: '女' }
-          ]
+          ] 
         },
         formItemProps: {
           rules: [{ required: true, message: '请选择性别' }],
@@ -152,27 +182,36 @@ const StudentAdminPage: React.FC = () => {
       },
     },
     {
-      title: '学校名称',
-      dataIndex: 'schoolname',
-      valueType: 'text',
-      hideInSearch: true,
-      formItemProps: {
-        rules: [{ required: true, message: '请输入学校名称' }],
+        title: '学校名称',
+        dataIndex: 'schoolname',
+        valueType: 'select',
+        fieldProps: {
+          options: schoolOptions,
+          showSearch: true,
+          filterOption: (input, option) => 
+            (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
+        },
+        hideInSearch: true,
+        formItemProps: {
+          rules: [{ required: true, message: '请选择学校名称' }],
+        },
       },
-    },
-    {
-      title: '学校所在地',
-      dataIndex: 'schoolprovince',
-      hideInSearch: true,
-      valueType: 'text',
-      render: (_, record) => (
-        `${record.schoolprovince || ''}${record.schoolcity || ''}${record.schoolarea || ''}${record.schooltown || ''}`
-      ),
-      search: false,
-      formItemProps: {
-        rules: [{ required: true, message: '请输入学校所在地' }],
+      {
+        title: '学校所在地',
+        dataIndex: 'schoolprovince',
+        valueType: 'select',
+        fieldProps: {
+          options: addressOptions,
+          showSearch: true,
+          filterOption: (input, option) => 
+            (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
+        },
+        hideInSearch: true,
+        formItemProps: {
+          rules: [{ required: true, message: '请选择学校所在地' }],
+        },
+        render: (_, record) => record.schoolprovince, // 简化显示
       },
-    },
     {
       title: '出生日期',
       dataIndex: 'birthday',
