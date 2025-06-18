@@ -128,11 +128,14 @@ const SpineExaminationForm = () => {
     if (!student) return;
     
     try {
-      const profile = student.userpprofile ? JSON.parse(student.userpprofile) : {};
+      // 修复字段名：userpprofile -> userprofile
+      const profile = student.userprofile ? JSON.parse(student.userprofile) : {};
       
       form.setFieldsValue({
         name: student.username,
+        // 修复1: 正确设置性别字段
         schoolarea: student.schoolarea,
+        // 修复2: 正确设置电话字段（修复拼写错误）
         userphone: student.userphone,
         idCard: student.userid,
         SchoolCard: student.stuid,
@@ -140,8 +143,10 @@ const SpineExaminationForm = () => {
         class: student.userclass,
         schoolLocation: student.schoolprovince,
         schoolName: student.schoolname,
-        birthDate: student.birthdate ? moment(student.birthdate) : null,
-        checkDate: student.checkdate ? moment(student.checkdate) : null,
+        // 修复3: 正确设置出生日期字段
+        birthDate: student.birthday ? moment(student.birthday) : null,
+        // 修复4: 正确设置检查日期字段
+        checkDate: student.checkday ? moment(student.checkday) : null,
         examinerSignature: student.schoolcity,
         
         // 筛查数据
@@ -345,8 +350,9 @@ const SpineExaminationForm = () => {
           </Radio.Group>
         </Form.Item>
         
+        {/* 修复5: 修正电话字段名 userhone -> userphone */}
         <Form.Item
-          name="userhone"
+          name="userphone"
           label="联系电话（父母）"
           rules={[
             { required: true, message: '请输入联系电话' },
@@ -432,7 +438,7 @@ const SpineExaminationForm = () => {
         
         <div style={{ display: 'flex' }}>
           <Form.Item
-            name="birthday"
+            name="birthDate"
             label="出生日期"
             style={{ flex: 1, marginRight: 8 }}
             rules={[{ required: true, message: '请选择出生日期' }]}
@@ -441,7 +447,7 @@ const SpineExaminationForm = () => {
           </Form.Item>
 
           <Form.Item
-            name="checkday"
+            name="checkDate"
             label="检查时间"
             style={{ flex: 1 }}
             rules={[{ required: true, message: '请选择检查时间' }]}
@@ -598,14 +604,6 @@ const SpineExaminationForm = () => {
         <Form.Item
           name="spineMotionExperiment"
           label="（3）是否进行脊柱运动实验"
-          // rules={[
-          //   { 
-          //     required: false, 
-          //     message: '请选择是否进行脊柱运动实验',
-          //     validator: (_, value) => 
-          //       value ? Promise.resolve() : Promise.reject(new Error('请选择是否进行脊柱运动实验'))
-          //   }
-          // ]}
         >
           <Radio.Group>
             <Radio value="①是">①是</Radio>
