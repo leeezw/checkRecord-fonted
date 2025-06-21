@@ -131,6 +131,33 @@ const SpineExaminationForm = () => {
     }
   };
 
+  //根据学籍卡号查询学生信息
+  const fetchStudentByStuId = async (stuId: string) => {
+    if (!stuId) return;
+    
+    setLoading(true);
+    try {
+      const response = await listStudentByPageUsingPost({ stuid: stuId });
+      if (response.code === 0 && response.data && response.data.records.length > 0) {
+        setExistingStudent(response.data.records[0]);
+        fillFormData(response.data.records[0]);
+        message.success('已加载学生信息');
+      } else {
+        setExistingStudent(null);
+        form.resetFields();
+        // 重置独立状态
+        setSpineMotionExperimentValue('');
+        setSpineAnteriorPosteriorCheckValue([]);
+        setScoliosisChecked(false);
+        message.info('未找到该学生信息，请填写完整表单');
+      }
+    } catch (error) {
+      message.error('查询学生信息失败');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   // 填充表单数据
   const fillFormData = (student: API.Student) => {
     if (!student) return;
@@ -394,7 +421,12 @@ const SpineExaminationForm = () => {
           label="学籍卡号"
           rules={[{ required: true, message: '请输入学籍卡号' }]}
         >
-          <Input placeholder="请输入学籍卡号" />
+          <Input.Search 
+            placeholder="请输入学籍卡号" 
+            // onBlur={handleIdCardBlur}
+            enterButton="查询"
+            onSearch={(value) => fetchStudentByStuId(value)}
+          />
         </Form.Item>
         
         <div style={{ display: 'flex' }}>
