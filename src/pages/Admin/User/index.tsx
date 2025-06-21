@@ -65,6 +65,17 @@ const UserAdminPage: React.FC = () => {
       dataIndex: 'userName',
       valueType: 'text',
     },
+    {
+      title: '密码',
+      dataIndex: 'userPassword',
+      valueType: 'password',
+      formItemProps: {
+        rules: [ { 
+          pattern: /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/, 
+          message: '密码至少8位，需包含字母和数字' 
+        }],
+      },
+    },
     // {
     //   title: '头像',
     //   dataIndex: 'userAvatar',
