@@ -1,12 +1,13 @@
 import CreateModal from '@/pages/Admin/student/components/CreateModal';
 import UpdateModal from '@/pages/Admin/student/components/UpdateModal';
 import { deleteStudentUsingPost, importExcelUsingPost, listSchool, listSchoolAddress, listStudentByPageUsingPost } from '@/services/backend/studentController';
-import { PlusOutlined, UploadOutlined, InboxOutlined } from '@ant-design/icons';
+import { PlusOutlined, UploadOutlined, InboxOutlined, ExportOutlined } from '@ant-design/icons';
 import type { ActionType, ProColumns } from '@ant-design/pro-components';
 import { PageContainer, ProTable } from '@ant-design/pro-components';
 import '@umijs/max';
-import { Button, message, Modal, Space, Typography, Upload } from 'antd';
+import { Button, message, Modal, Select, Space, Typography, Upload } from 'antd';
 import type { UploadFile } from 'antd/es/upload/interface';
+import { request } from '@umijs/max';
 import React, { useEffect, useRef, useState } from 'react';
 
 const { Dragger } = Upload;
@@ -22,9 +23,11 @@ const StudentAdminPage: React.FC = () => {
   const [uploading, setUploading] = useState<boolean>(false);
   const actionRef = useRef<ActionType>();
   const [currentRow, setCurrentRow] = useState<API.Student>();
-
+  const [exporting, setExporting] = useState<boolean>(false); // 新增导出加载状态
+  const [selectedExportSchool, setSelectedExportSchool] = useState<string | undefined>(undefined); // 新增选中的学校
   const [schoolOptions, setSchoolOptions] = useState<{label: string; value: string}[]>([]);
   const [addressOptions, setAddressOptions] = useState<{label: string; value: string}[]>([]);
+  const [exportModalVisible, setExportModalVisible] = useState<boolean>(false); // 新增导出模态框状态
   useEffect(() => {
     const loadOptions = async () => {
       try {
@@ -55,6 +58,59 @@ const StudentAdminPage: React.FC = () => {
   }, []);
   // 身份证号正则验证
   const idCardRegex = /^[1-9]\d{5}(18|19|20)\d{2}(0[1-9]|1[0-2])(0[1-9]|[12]\d|3[01])\d{3}[\dXx]$/;
+
+    // 新增：处理导出功能
+    const handleExport = async () => {
+        setExporting(true);
+        try {
+          // 构建请求 URL
+          const params = new URLSearchParams({
+            name: selectedExportSchool || '',
+          });
+      
+          const response = await fetch(`http://localhost:8101/api/student/export?${params.toString()}`, {
+            method: 'GET',
+            headers: {
+              // 如果你后端有权限控制，可以加上 Token
+              // 'Authorization': `Bearer ${token}`,
+            },
+          });
+      
+          if (!response.ok) {
+            throw new Error(`请求失败，状态码：${response.status}`);
+          }
+      
+          // 获取 Blob 数据
+          const blob = await response.blob();
+      
+          // 创建下载链接
+          const url = window.URL.createObjectURL(blob);
+          const link = document.createElement('a');
+          link.href = url;
+      
+          // 设置下载文件名
+          const fileName = selectedExportSchool
+            ? `学生数据_${selectedExportSchool}.xlsx`
+            : '全部学生数据.xlsx';
+          link.setAttribute('download', fileName);
+      
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+      
+          message.success('导出成功');
+          setExportModalVisible(false);
+        } catch (error: any) {
+          message.error(`导出失败：${error.message}`);
+        } finally {
+          setExporting(false);
+        }
+      };
+      
+      
+      
+      
+      
   
   // 手机号正则验证
   const phoneRegex = /^1[3-9]\d{9}$/;
@@ -285,7 +341,16 @@ const StudentAdminPage: React.FC = () => {
           >
             <UploadOutlined /> 批量导入
           </Button>,
+                    // 新增导出按钮
+                    <Button 
+                    type="primary" 
+                    key="export" 
+                    onClick={() => setExportModalVisible(true)}
+                  >
+                    <ExportOutlined /> 批量导出
+                  </Button>,
         ]}
+        
         request={async (params, sort, filter) => {
           const sortField = Object.keys(sort)?.[0];
           const sortOrder = sort?.[sortField] ?? undefined;
@@ -303,6 +368,33 @@ const StudentAdminPage: React.FC = () => {
         }}
         columns={columns}
       />
+
+            {/* 导出模态框 */}
+            <Modal
+        title="批量导出学生"
+        open={exportModalVisible}
+        onCancel={() => setExportModalVisible(false)}
+        onOk={handleExport}
+        confirmLoading={exporting}
+        okText="开始导出"
+        cancelText="取消"
+      >
+        <div style={{ marginBottom: 16 }}>
+          <label>选择学校：</label>
+          <Select
+            style={{ width: '100%', marginTop: 8 }}
+            placeholder="请选择学校（不选则导出全部学生）"
+            value={selectedExportSchool}
+            onChange={setSelectedExportSchool}
+            options={[
+              { label: '全部学校', value: '' }, // 使用空字符串表示全部
+              ...schoolOptions
+            ]}
+            allowClear
+          />
+        </div>
+        <p>将导出Excel格式的学生数据文件</p>
+      </Modal>
       
       {/* 新建模态框 */}
       <CreateModal
